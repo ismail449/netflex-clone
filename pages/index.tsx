@@ -2,6 +2,7 @@ import Head from "next/head";
 import Banner from "@/components/banner/banner";
 import Navbar from "@/components/navbar/navbar";
 import styles from "@/styles/Home.module.css";
+import Card from "@/components/card/card";
 
 export default function Home() {
   return (
@@ -18,6 +19,9 @@ export default function Home() {
         subTitle="cute dog"
         title="clifford the big red dog"
       />
+      <Card imgUrl="" size="large" />
+      <Card imgUrl="/static/clifford.webp" size="medium" />
+      <Card imgUrl="/static/clifford.webp" size="small" />
     </>
   );
 }
