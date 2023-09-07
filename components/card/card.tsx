@@ -1,5 +1,7 @@
 import React, { FC, useState } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import classNames from "classnames";
 import styles from "./card.module.css";
 
 type CardProps = {
@@ -22,7 +24,10 @@ const Card: FC<CardProps> = ({ imgUrl, size = "medium" }) => {
   };
   return (
     <div className={styles.container}>
-      <div className={classMap[size]}>
+      <motion.div
+        whileHover={{ scale: 1.2 }}
+        className={classNames(styles.imgMotionWrapper, classMap[size])}
+      >
         <Image
           onError={handleImageError}
           src={imgSrc}
@@ -30,7 +35,7 @@ const Card: FC<CardProps> = ({ imgUrl, size = "medium" }) => {
           fill
           className={styles.cardImg}
         />
-      </div>
+      </motion.div>
     </div>
   );
 };
