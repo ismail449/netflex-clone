@@ -1,30 +1,17 @@
 import Head from "next/head";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Banner from "@/components/banner/banner";
 import Navbar from "@/components/navbar/navbar";
 import styles from "@/styles/Home.module.css";
 import CardsSection from "@/components/cards-section/cards-section";
+import { getPopularVideos, getVideos, Video } from "@/lib/videos";
 
-export default function Home() {
-  const disneyVideos = [
-    {
-      imgUrl: "/static/clifford.webp",
-    },
-    {
-      imgUrl: "/static/clifford.webp",
-    },
-    {
-      imgUrl: "/static/clifford.webp",
-    },
-    {
-      imgUrl: "/static/clifford.webp",
-    },
-    {
-      imgUrl: "/static/clifford.webp",
-    },
-    {
-      imgUrl: "/static/clifford.webp",
-    },
-  ];
+export default function Home({
+  DCVideos,
+  travelVideos,
+  productivityVideos,
+  popularVideos,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <>
       <Head>
@@ -33,17 +20,46 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar userName="ismail" />
-      <Banner
-        imgUrl="/static/clifford.webp"
-        subTitle="cute dog"
-        title="clifford the big red dog"
-      />
-      <div className={styles.sectionWrapper}>
-        <CardsSection title="DC" videos={disneyVideos} size="large" />
-        <CardsSection title="DC" videos={disneyVideos} size="medium" />
-        <CardsSection title="DC" videos={disneyVideos} size="small" />
+      <div className={styles.main}>
+        <Navbar userName="ismail" />
+        <Banner
+          imgUrl="/static/clifford.webp"
+          subTitle="cute dog"
+          title="clifford the big red dog"
+        />
+        <div className={styles.sectionWrapper}>
+          <CardsSection title="DC" videos={DCVideos} size="large" />
+          <CardsSection title="Travel" videos={travelVideos} size="small" />
+          <CardsSection
+            title="Productivity"
+            videos={productivityVideos}
+            size="medium"
+          />
+          <CardsSection
+            title="Popular in Egypt"
+            videos={popularVideos}
+            size="small"
+          />
+        </div>
       </div>
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<{
+  DCVideos: Video[];
+  travelVideos: Video[];
+  productivityVideos: Video[];
+  popularVideos: Video[];
+}> = async () => {
+  const DCVideos = await getVideos("DC trailers");
+  const travelVideos = await getVideos("travel");
+
+  const productivityVideos = await getVideos("productivity");
+
+  const popularVideos = await getPopularVideos();
+
+  return {
+    props: { DCVideos, travelVideos, productivityVideos, popularVideos },
+  };
+};
