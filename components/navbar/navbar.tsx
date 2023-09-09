@@ -30,7 +30,7 @@ const Navbar: FC<NavbarProps> = ({ userName }) => {
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <a className={styles.logoLink} href="#">
+        <Link className={styles.logoLink} href="/">
           <div className={styles.logoWrapper}>
             <Image
               alt="netflix logo"
@@ -39,7 +39,7 @@ const Navbar: FC<NavbarProps> = ({ userName }) => {
               height={34}
             />
           </div>
-        </a>
+        </Link>
 
         <ul className={styles.navItems}>
           <li className={styles.navItem} onClick={handleHomeNavigation}>
