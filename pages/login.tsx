@@ -2,13 +2,19 @@ import React, { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { validateEmail } from "@/utils";
 import styles from "@/styles/Login.module.css";
 
 const Login = () => {
   const [emailError, setEmailError] = useState("");
+  const [email, setEmail] = useState("");
+  const router = useRouter();
 
   const handleOnChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
+    const email = e.target.value;
+    setEmailError("");
+    setEmail(email);
   };
 
   const handleLoginWithEmail = async (
@@ -16,6 +22,11 @@ const Login = () => {
   ) => {
     e.preventDefault();
     console.log("logged in");
+    if (!validateEmail(email)) {
+      setEmailError("Enter a valid email address");
+      return;
+    }
+    router.push("/");
   };
 
   return (
@@ -46,7 +57,7 @@ const Login = () => {
             className={styles.emailInput}
             onChange={handleOnChangeEmail}
           />
-          <p className={styles.userMsg}></p>
+          <p className={styles.userMsg}>{emailError}</p>
           <button onClick={handleLoginWithEmail} className={styles.loginBtn}>
             Sign In
           </button>
