@@ -1,15 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { validateEmail } from "@/utils";
+import { loginInWithEmail } from "@/lib/magic-client";
 import styles from "@/styles/Login.module.css";
 
 const Login = () => {
   const [emailError, setEmailError] = useState("");
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChangeComplete = () => {
+      setIsLoading(false);
+    };
+    router.events.on("routeChangeComplete", handleRouteChangeComplete);
+    router.events.on("routeChangeError", handleRouteChangeComplete);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChangeComplete);
+      router.events.off("routeChangeError", handleRouteChangeComplete);
+    };
+  }, [router]);
 
   const handleOnChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const email = e.target.value;
@@ -21,12 +35,18 @@ const Login = () => {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
+    setIsLoading(true);
     console.log("logged in");
     if (!validateEmail(email)) {
       setEmailError("Enter a valid email address");
+      setIsLoading(false);
       return;
     }
-    router.push("/");
+    const didToken = await loginInWithEmail(email);
+    console.log(didToken);
+    if (didToken) {
+      router.push("/");
+    }
   };
 
   return (
@@ -59,7 +79,7 @@ const Login = () => {
           />
           <p className={styles.userMsg}>{emailError}</p>
           <button onClick={handleLoginWithEmail} className={styles.loginBtn}>
-            Sign In
+            {isLoading ? "Loading..." : "Sign In"}
           </button>
         </div>
       </main>

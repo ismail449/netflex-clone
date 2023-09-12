@@ -5,7 +5,6 @@ import Navbar from "@/components/navbar/navbar";
 import styles from "@/styles/Home.module.css";
 import CardsSection from "@/components/cards-section/cards-section";
 import { getPopularVideos, getVideos, Video } from "@/lib/videos";
-import { magic } from "@/lib/magic-client";
 
 export default function Home({
   DCVideos,
@@ -13,7 +12,6 @@ export default function Home({
   productivityVideos,
   popularVideos,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  console.log(magic);
   return (
     <>
       <Head>
@@ -23,7 +21,7 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.main}>
-        <Navbar userName="ismail" />
+        <Navbar />
         <Banner
           imgUrl="/static/clifford.webp"
           subTitle="cute dog"
