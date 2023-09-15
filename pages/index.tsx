@@ -23,6 +23,7 @@ export default function Home({
       <div className={styles.main}>
         <Navbar />
         <Banner
+          videoId="4zH5iYM4wJo"
           imgUrl="/static/clifford.webp"
           subTitle="cute dog"
           title="clifford the big red dog"

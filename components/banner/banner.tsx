@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import styles from "./banner.module.css";
 
@@ -6,11 +7,14 @@ type BannerProps = {
   title: string;
   subTitle: string;
   imgUrl: string;
+  videoId: string;
 };
 
-const Banner: FC<BannerProps> = ({ imgUrl, subTitle, title }) => {
+const Banner: FC<BannerProps> = ({ imgUrl, subTitle, title, videoId }) => {
+  const router = useRouter();
   const handleOnPlay = () => {
     console.log("play");
+    router.push(`/video/${videoId}`);
   };
   return (
     <div className={styles.container}>
