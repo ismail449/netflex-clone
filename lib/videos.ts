@@ -42,6 +42,7 @@ export const getCommonVideos = async (url: string) => {
     const response = await fetch(
       `${baseUrl}/${url}&maxResults=25&key=${YOUTUBE_API_KEY}`
     );
+
     if (!response.ok) {
       return [];
     }
