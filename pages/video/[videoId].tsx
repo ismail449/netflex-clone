@@ -1,22 +1,28 @@
 import React from "react";
 import Modal from "react-modal";
 import { useRouter } from "next/router";
+import type {
+  InferGetStaticPropsType,
+  GetStaticProps,
+  GetStaticPaths,
+} from "next";
 import classNames from "classnames";
 import styles from "@/styles/Video.module.css";
 
 Modal.setAppElement("#__next");
 
-const Video = () => {
+type Video = {
+  title: string;
+  publishTime: string;
+  description: string;
+  channelTitle: string;
+  viewCount: number;
+};
+
+const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const router = useRouter();
   const { videoId } = router.query;
 
-  const video = {
-    title: "Hi cute dog",
-    publishTime: "1990-01-01",
-    description: "A big red dog that is super cute, can he get any bigger?",
-    channelTitle: "Paramount Pictures",
-    viewCount: 10000,
-  };
   const { channelTitle, description, publishTime, title, viewCount } = video;
   return (
     <div className={styles.container}>
@@ -59,5 +65,29 @@ const Video = () => {
     </div>
   );
 };
+export const getStaticProps = (async () => {
+  const video = {
+    title: "Hi cute dog",
+    publishTime: "1990-01-01",
+    description: "A big red dog that is super cute, can he get any bigger?",
+    channelTitle: "Paramount Pictures",
+    viewCount: 10000,
+  };
+  return {
+    props: { video },
+    revalidate: 10,
+  };
+}) satisfies GetStaticProps<{
+  video: Video;
+}>;
+
+export const getStaticPaths = (() => {
+  const videoIds = ["cBFq_6Zj2aA", "-FZ-pPFAjYY", "LDG9bisJEaI"];
+  const paths = videoIds.map((videoId) => ({
+    params: { videoId },
+  }));
+
+  return { paths, fallback: "blocking" };
+}) satisfies GetStaticPaths;
 
 export default Video;
