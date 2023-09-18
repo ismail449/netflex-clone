@@ -1,6 +1,10 @@
 export type Video = {
-  imgUrl: string;
   title: string;
+  description: string;
+  publishTime: string;
+  channelTitle: string;
+  statistics: Statistics;
+  imgUrl: string;
   id: string;
 };
 
@@ -11,6 +15,7 @@ export interface Videos {
 export interface Item {
   id: ID | string;
   snippet: Snippet;
+  statistics: Statistics;
 }
 
 export interface ID {
@@ -22,6 +27,10 @@ export interface Snippet {
   title: string;
   description: string;
   thumbnails: Thumbnails;
+  channelTitle: string;
+}
+export interface Statistics {
+  viewCount: string;
 }
 
 export interface Thumbnails {
@@ -49,9 +58,14 @@ export const getCommonVideos = async (url: string) => {
     const videosData: Videos = await response.json();
 
     return videosData.items.map((item) => {
+      const snippet = item.snippet;
       return {
+        title: snippet.title,
+        description: snippet.description,
+        publishTime: snippet.publishedAt,
+        channelTitle: snippet.channelTitle,
+        statistics: item.statistics ? item.statistics : { viewCount: "0" },
         imgUrl: item.snippet.thumbnails.high.url,
-        title: item.snippet.title,
         id: typeof item.id === "string" ? item.id : item.id.videoId,
       };
     });
@@ -69,5 +83,10 @@ export const getVideos = async (searchQuery: string) => {
 export const getPopularVideos = async () => {
   const url =
     "videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&regionCode=EG";
+  return await getCommonVideos(url);
+};
+
+export const getYoutubeVideoById = async (id: string) => {
+  const url = `videos?part=snippet%2CcontentDetails%2Cstatistics&id=${id}`;
   return await getCommonVideos(url);
 };

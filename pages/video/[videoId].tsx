@@ -8,22 +8,17 @@ import type {
 } from "next";
 import classNames from "classnames";
 import styles from "@/styles/Video.module.css";
+import { getYoutubeVideoById, Video } from "@/lib/videos";
+import { formatDate } from "@/utils";
 
 Modal.setAppElement("#__next");
-
-type Video = {
-  title: string;
-  publishTime: string;
-  description: string;
-  channelTitle: string;
-  viewCount: number;
-};
 
 const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const router = useRouter();
   const { videoId } = router.query;
 
-  const { channelTitle, description, publishTime, title, viewCount } = video;
+  const { channelTitle, description, publishTime, title, statistics } = video;
+  console.log(formatDate(publishTime));
   return (
     <div className={styles.container}>
       <Modal
@@ -43,7 +38,7 @@ const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
         <div className={styles.modalBody}>
           <div className={styles.modalBodyContent}>
             <div className={styles.col1}>
-              <p className={styles.publishTime}> {publishTime} </p>
+              <p className={styles.publishTime}> {formatDate(publishTime)} </p>
               <p className={styles.title}> {title} </p>
               <p className={styles.description}> {description} </p>
             </div>
@@ -56,7 +51,13 @@ const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
               <p className={classNames(styles.subText, styles.subTextWrapper)}>
                 {" "}
                 <span className={styles.textColor}> View Count: </span>
-                <span className={styles.channelTitle}> {viewCount} </span>
+                <span className={styles.channelTitle}>
+                  {" "}
+                  {statistics.viewCount.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}{" "}
+                </span>
               </p>
             </div>
           </div>
@@ -66,13 +67,16 @@ const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
   );
 };
 export const getStaticProps = (async () => {
-  const video = {
+  /* const video = {
     title: "Hi cute dog",
     publishTime: "1990-01-01",
     description: "A big red dog that is super cute, can he get any bigger?",
     channelTitle: "Paramount Pictures",
     viewCount: 10000,
-  };
+  }; */
+  const videoId = "4zH5iYM4wJo";
+  const videos = await getYoutubeVideoById(videoId);
+  const video = videos[0];
   return {
     props: { video },
     revalidate: 10,
