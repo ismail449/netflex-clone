@@ -1,3 +1,4 @@
+import videoTestData from "../data/videos.json";
 export type Video = {
   title: string;
   description: string;
@@ -8,11 +9,7 @@ export type Video = {
   id: string;
 };
 
-export interface Videos {
-  items: Item[];
-}
-
-export interface Item {
+export interface VideoItem {
   id: ID | string;
   snippet: Snippet;
   statistics: Statistics;
@@ -43,21 +40,25 @@ export interface Default {
   height?: number;
 }
 
-export const getCommonVideos = async (url: string) => {
+export const fetchVideos = async (url: string) => {
   const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
   const baseUrl = "https://youtube.googleapis.com/youtube/v3";
+  const response = await fetch(
+    `${baseUrl}/${url}&maxResults=25&key=${YOUTUBE_API_KEY}`
+  );
 
+  if (!response.ok) {
+    return [];
+  }
+  return await response.json();
+};
+
+export const getCommonVideos = async (url: string) => {
   try {
-    const response = await fetch(
-      `${baseUrl}/${url}&maxResults=25&key=${YOUTUBE_API_KEY}`
-    );
-
-    if (!response.ok) {
-      return [];
-    }
-    const videosData: Videos = await response.json();
-
-    return videosData.items.map((item) => {
+    const isDev = process.env.DEVELOPMENT;
+    console.log({ isDev });
+    const videos = isDev ? videoTestData : await fetchVideos(url);
+    return videos.items.map((item: VideoItem) => {
       const snippet = item.snippet;
       return {
         title: snippet.title,
