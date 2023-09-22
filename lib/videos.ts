@@ -56,8 +56,8 @@ export const fetchVideos = async (url: string) => {
 export const getCommonVideos = async (url: string) => {
   try {
     const isDev = process.env.DEVELOPMENT;
-    console.log({ isDev });
-    const videos = isDev ? videoTestData : await fetchVideos(url);
+    const videos =
+      isDev && url.includes("search") ? videoTestData : await fetchVideos(url);
     return videos.items.map((item: VideoItem) => {
       const snippet = item.snippet;
       return {

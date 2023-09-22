@@ -21,7 +21,6 @@ const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
 
   const { channelTitle, description, publishTime, title, statistics } = video;
   const viewCount = +statistics.viewCount;
-  console.log(formatDate(publishTime));
   return (
     <>
       <Head>
