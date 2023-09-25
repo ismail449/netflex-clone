@@ -2,9 +2,10 @@ import Head from "next/head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Banner from "@/components/banner/banner";
 import Navbar from "@/components/navbar/navbar";
-import styles from "@/styles/Home.module.css";
 import CardsSection from "@/components/cards-section/cards-section";
 import { getPopularVideos, getVideos, Video } from "@/lib/videos";
+import { startFetchMyQuery } from "@/lib/db/hasura";
+import styles from "@/styles/Home.module.css";
 
 export default function Home({
   DCVideos,
@@ -12,6 +13,7 @@ export default function Home({
   productivityVideos,
   popularVideos,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  startFetchMyQuery();
   return (
     <>
       <Head>
