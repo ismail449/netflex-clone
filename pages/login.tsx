@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { validateEmail } from "@/utils";
-import { loginInWithEmail } from "@/lib/magic-client";
+import { loginInWithEmail, signOutUser } from "@/lib/magic-client";
 import styles from "@/styles/Login.module.css";
 
 const Login = () => {
@@ -43,8 +43,21 @@ const Login = () => {
       return;
     }
     const didToken = await loginInWithEmail(email);
-    console.log(didToken);
     if (didToken) {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${didToken}`,
+          "Content-type": "application/json",
+        },
+      });
+      const loggedInResponse = await response.json();
+      if (!loggedInResponse.isLogged) {
+        setIsLoading(false);
+        setEmailError("Something went wrong logging in");
+        signOutUser();
+        return;
+      }
       router.push("/");
     }
   };

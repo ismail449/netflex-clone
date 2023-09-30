@@ -30,15 +30,17 @@ const login = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       process.env.JWT_SECRET ?? ""
     );
     const isNewUserQuery = await isNewUser(token, metaData.issuer ?? "");
-    let newUser = null;
     if (isNewUserQuery) {
-      newUser = await createNewUser(token, metaData);
+      await createNewUser(token, metaData);
     }
     setTokenCookie(token, res);
-    res.send({ response: { token, isNewUserQuery, newUser } });
+    res.send({
+      isNewUser: isNewUserQuery,
+      isLogged: true,
+    });
   } catch (error) {
     console.error("something went wrong logging in", error);
-    res.status(500).send({ response: "not done" });
+    res.status(500).send({ error, isLogged: false });
   }
 };
 export default login;
