@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { magicAdmin } from "@/lib/magic";
 import jwt from "jsonwebtoken";
-import { isNewUser } from "@/lib/db/hasura";
+import { isNewUser, createNewUser } from "@/lib/db/hasura";
 
 type Data = {
   response: any;
@@ -28,8 +28,12 @@ const login = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       },
       process.env.JWT_SECRET ?? ""
     );
-    const isNewQuery = await isNewUser(token, metaData.issuer ?? "");
-    res.send({ response: { token, isNewQuery } });
+    const isNewUserQuery = await isNewUser(token, metaData.issuer ?? "");
+    let newUser = null;
+    if (isNewUserQuery) {
+      newUser = await createNewUser(token, metaData);
+    }
+    res.send({ response: { token, isNewUserQuery, newUser } });
   } catch (error) {
     console.error("something went wrong logging in", error);
     res.status(500).send({ response: "not done" });
