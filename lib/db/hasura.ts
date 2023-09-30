@@ -4,7 +4,6 @@ export async function queryHasuraGQL(
   variables: Record<string, any>,
   token: string
 ) {
-  console.log({ token });
   try {
     const result = await fetch(process.env.NEXT_PUBLIC_HASURA_ADMIN_URL ?? "", {
       method: "POST",
@@ -23,39 +22,21 @@ export async function queryHasuraGQL(
     console.log(error);
   }
 }
-export async function isNewUser(token: string, didToken: string) {
+export async function isNewUser(token: string, issuer: string) {
   const operationsDoc = `
-  query MyQuery {
-    users(where: {issuer: {_eq: ${didToken}}}) {      
+  query isNewUser($issuer: String!) {
+    users(where: {issuer: {_eq: $issuer}}) {      
       email
       id
       issuer
     }
   }
 `;
-  const response = await queryHasuraGQL(operationsDoc, "MyQuery", {}, token);
-  console.log({ response });
+  const response = await queryHasuraGQL(
+    operationsDoc,
+    "isNewUser",
+    { issuer },
+    token
+  );
   return response?.data?.users?.length === 0;
 }
-function fetchMyQuery() {
-  const operationsDoc = `
-    query MyQuery {
-      users(where: {issuer: {_eq: ""}}) {
-        email
-        id
-        issuer
-      }
-    }
-  `;
-  return queryHasuraGQL(operationsDoc, "MyQuery", {}, "");
-}
-export async function startFetchMyQuery() {
-  const { errors, data } = await fetchMyQuery();
-  if (errors) {
-    // handle those errors like a pro
-    console.error(errors);
-  }
-  // do something great with this precious data
-  console.log(data);
-}
-startFetchMyQuery();

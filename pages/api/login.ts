@@ -26,10 +26,10 @@ const login = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
           "x-hasura-user-id": `${metaData.issuer}`,
         },
       },
-      "7MUCcF13iWfqmTLWeafaNQC5A2FgehNr"
+      process.env.JWT_SECRET ?? ""
     );
-    const isNew = await isNewUser(token, didToken);
-    res.send({ response: { token, isNew } });
+    const isNewQuery = await isNewUser(token, metaData.issuer ?? "");
+    res.send({ response: { token, isNewQuery } });
   } catch (error) {
     console.error("something went wrong logging in", error);
     res.status(500).send({ response: "not done" });
