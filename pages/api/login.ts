@@ -4,10 +4,6 @@ import jwt from "jsonwebtoken";
 import { isNewUser, createNewUser } from "@/lib/db/hasura";
 import { setTokenCookie } from "@/lib/cookies";
 
-type Data = {
-  response: any;
-};
-
 const login = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   if (req.method !== "POST") {
     res.status(500).send({ response: "only POST method is allowed" });

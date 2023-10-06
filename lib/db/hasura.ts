@@ -1,5 +1,81 @@
 import { MagicUserMetadata } from "@magic-sdk/admin/dist/cjs/types";
 
+export async function insertStats(
+  token: string,
+  stats: {
+    favourited: number;
+    userId: string;
+    watched: boolean;
+    videoId: string;
+  }
+) {
+  const operationsDoc = `
+  mutation insertStats($favourited: Int!, $userId: 
+  String!, $watched: Boolean!, $videoId: String!) {
+    insert_stats_one(object: {favourited: $favourited, 
+    userId: $userId, watched: $watched, videoId: $videoId}
+    ) {
+      favourited
+      id
+      userId
+    }
+  }
+`;
+  const { favourited, userId, videoId, watched } = stats;
+  const response = await queryHasuraGQL(
+    operationsDoc,
+    "insertStats",
+    {
+      favourited,
+      userId,
+      videoId,
+      watched,
+    },
+    token
+  );
+  return response;
+}
+
+export async function updateStats(
+  token: string,
+  stats: {
+    favourited: number;
+    userId: string;
+    watched: boolean;
+    videoId: string;
+  }
+) {
+  const operationsDoc = `
+  mutation updateStats($favourited: Int!, $userId: String!, $watched: Boolean!, $videoId: String!) {
+    update_stats(
+      _set: {watched: $watched, favourited: $favourited}, 
+      where: {
+        userId: {_eq: $userId}, 
+        videoId: {_eq: $videoId}
+      }) {
+      returning {
+        favourited,
+        userId,
+        watched,
+        videoId
+      }
+    }
+  }
+  `;
+  const { favourited, userId, videoId, watched } = stats;
+  const response = await queryHasuraGQL(
+    operationsDoc,
+    "updateStats",
+    {
+      favourited,
+      userId,
+      videoId,
+      watched,
+    },
+    token
+  );
+  return response;
+}
 export async function queryHasuraGQL(
   operationsDoc: string,
   operationName: string,
@@ -70,6 +146,33 @@ export async function createNewUser(
     },
     token
   );
-  console.log({ response, issuer });
   return response;
 }
+
+export const findVideIdByUser = async (
+  token: string,
+  userId: string,
+  videoId: string
+) => {
+  const operationsDoc = `
+  query findVideoIdByUserId($userId: String!, $videoId: String!) {
+    stats(where: { userId: {_eq: $userId}, videoId: {_eq: $videoId }}) {
+      id
+      userId
+      videoId
+      favourited
+      watched
+    }
+  }
+`;
+  const response = await queryHasuraGQL(
+    operationsDoc,
+    "findVideoIdByUserId",
+    {
+      videoId,
+      userId,
+    },
+    token
+  );
+  return response?.data?.stats.length > 0;
+};
