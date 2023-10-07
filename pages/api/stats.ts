@@ -18,11 +18,13 @@ export default async function stats(
       return;
     }
     const { videoId, favourited, watched = true } = req.body;
+    if (!videoId || typeof favourited !== "number") {
+      res.status(400).send({ error: "video id or favourited are missing" });
+      return;
+    }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
-    if (typeof decodedToken === "string" || typeof videoId !== "string") {
-      res
-        .status(400)
-        .send({ errorMessage: "error decoding JWT Token or getting video id" });
+    if (typeof decodedToken === "string") {
+      res.status(400).send({ error: "error decoding JWT Token" });
       return;
     }
 
@@ -46,7 +48,7 @@ export default async function stats(
       });
     }
 
-    res.status(200).json({ decodedToken, isStatesFound, responseStats });
+    res.status(200).json({ data: responseStats });
   } catch (error) {
     res.status(500).send({ error });
   }
