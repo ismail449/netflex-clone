@@ -107,3 +107,18 @@ export const likeDislikeVideo = async (videoId: string, favourited: number) => {
   });
   return await response.json();
 };
+
+export const getVideoLikeDislike = async (videoId: string) => {
+  const response = await fetch(`/api/stats?videoId=${videoId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const { foundVideo } = await response.json();
+  if (foundVideo.length > 0) {
+    console.log(foundVideo);
+
+    return foundVideo[0].favourited;
+  }
+};

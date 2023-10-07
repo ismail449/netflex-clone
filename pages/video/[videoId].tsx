@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useRouter } from "next/router";
 import type {
@@ -8,7 +8,12 @@ import type {
 } from "next";
 import classNames from "classnames";
 import styles from "@/styles/Video.module.css";
-import { getYoutubeVideoById, likeDislikeVideo, Video } from "@/lib/videos";
+import {
+  getVideoLikeDislike,
+  getYoutubeVideoById,
+  likeDislikeVideo,
+  Video,
+} from "@/lib/videos";
 import { formatDate } from "@/utils";
 import Head from "next/head";
 import Navbar from "@/components/navbar/navbar";
@@ -25,6 +30,18 @@ const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
 
   const { channelTitle, description, publishTime, title, statistics } = video;
   const viewCount = +statistics.viewCount;
+
+  useEffect(() => {
+    const getLikeDislike = async () => {
+      const favourited = await getVideoLikeDislike(videoId);
+      if (favourited === 0) {
+        setToggleDisLike(true);
+      } else if (favourited === 1) {
+        setToggleLike(true);
+      }
+    };
+    getLikeDislike();
+  }, [videoId]);
 
   const handleToggleLike = async () => {
     console.log("handleToggleLike");
