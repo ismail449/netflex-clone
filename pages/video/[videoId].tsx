@@ -8,7 +8,7 @@ import type {
 } from "next";
 import classNames from "classnames";
 import styles from "@/styles/Video.module.css";
-import { getYoutubeVideoById, Video } from "@/lib/videos";
+import { getYoutubeVideoById, likeDislikeVideo, Video } from "@/lib/videos";
 import { formatDate } from "@/utils";
 import Head from "next/head";
 import Navbar from "@/components/navbar/navbar";
@@ -21,20 +21,24 @@ const Video = ({ video }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const [toggleLike, setToggleLike] = useState(false);
   const [toggleDisLike, setToggleDisLike] = useState(false);
   const router = useRouter();
-  const { videoId } = router.query;
+  const videoId = router.query.videoId as string;
 
   const { channelTitle, description, publishTime, title, statistics } = video;
   const viewCount = +statistics.viewCount;
 
-  const handleToggleLike = () => {
+  const handleToggleLike = async () => {
     console.log("handleToggleLike");
     setToggleLike(true);
     setToggleDisLike(false);
+    const response = await likeDislikeVideo(videoId, 1);
+    console.log(response);
   };
-  const handleToggleDislike = () => {
+  const handleToggleDislike = async () => {
     console.log("handleToggleDislike");
     setToggleLike(false);
     setToggleDisLike(true);
+    const response = await likeDislikeVideo(videoId, 0);
+    console.log(response);
   };
   return (
     <>

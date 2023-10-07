@@ -93,3 +93,17 @@ export const getYoutubeVideoById = async (id: string) => {
   const url = `videos?part=snippet%2CcontentDetails%2Cstatistics&id=${id}`;
   return await getCommonVideos(url);
 };
+
+export const likeDislikeVideo = async (videoId: string, favourited: number) => {
+  const response = await fetch("/api/stats", {
+    method: "POST",
+    body: JSON.stringify({
+      videoId,
+      favourited,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return await response.json();
+};
