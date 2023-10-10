@@ -176,3 +176,27 @@ export const findVideIdByUser = async (
   );
   return response?.data?.stats;
 };
+
+export const getWatchedVideos = async (userId: string, token: string) => {
+  const operationsDoc = `
+  query watchedVideos($userId: String!) {
+    stats(where: {
+      watched: {_eq: true}, 
+      userId: {_eq: $userId},
+    }) {
+      videoId
+    }
+  }
+`;
+
+  const response = await queryHasuraGQL(
+    operationsDoc,
+    "watchedVideos",
+    {
+      userId,
+    },
+    token
+  );
+
+  return response?.data?.stats;
+};

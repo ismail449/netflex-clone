@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
-import { getUserEmail, signOutUser } from "@/lib/magic-client";
+import { getUserInfo, signOutUser } from "@/lib/magic-client";
 import styles from "./navbar.module.css";
 
 const Navbar = () => {
@@ -12,9 +12,9 @@ const Navbar = () => {
 
   useEffect(() => {
     const getEmail = async () => {
-      const email = await getUserEmail();
-      if (email) {
-        setUserEmail(email);
+      const userInfo = await getUserInfo();
+      if (userInfo?.email) {
+        setUserEmail(userInfo?.email);
       }
     };
     getEmail();

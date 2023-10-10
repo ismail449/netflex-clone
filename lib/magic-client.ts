@@ -20,11 +20,10 @@ export const loginInWithEmail = async (email: string) => {
   }
 };
 
-export const getUserEmail = async () => {
+export const getUserInfo = async () => {
   try {
     if (magic) {
-      const { email } = await magic.user.getInfo();
-      return email;
+      return await magic.user.getInfo();
     }
   } catch (error) {
     console.error("something went wrong getting user info", error);

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
 import { insertStats, findVideIdByUser, updateStats } from "@/lib/db/hasura";
+import { verifyToken } from "@/utils";
 
 export default async function stats(
   req: NextApiRequest,
@@ -12,12 +13,7 @@ export default async function stats(
       res.status(403).send({ error: "Not Authorized" });
       return;
     }
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
-    if (typeof decodedToken === "string") {
-      res.status(400).send({ error: "error decoding JWT Token" });
-      return;
-    }
-    const userId = decodedToken.issuer;
+    const userId = await verifyToken(token);
     const inputParams = req.method === "POST" ? req.body : req.query;
     const { videoId } = inputParams;
     if (!videoId) {

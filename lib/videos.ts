@@ -1,4 +1,6 @@
 import videoTestData from "../data/videos.json";
+import { getWatchedVideos } from "./db/hasura";
+
 export type Video = {
   title: string;
   description: string;
@@ -23,21 +25,10 @@ export interface Snippet {
   publishedAt: string;
   title: string;
   description: string;
-  thumbnails: Thumbnails;
   channelTitle: string;
 }
 export interface Statistics {
   viewCount: string;
-}
-
-export interface Thumbnails {
-  high: Default;
-}
-
-export interface Default {
-  url: string;
-  width?: number;
-  height?: number;
 }
 
 export const fetchVideos = async (url: string) => {
@@ -62,14 +53,15 @@ export const getCommonVideos = async (url: string) => {
         : await fetchVideos(url);
     return videos.items.map((item: VideoItem) => {
       const snippet = item.snippet;
+      const id = typeof item.id === "string" ? item.id : item.id.videoId;
       return {
         title: snippet.title,
         description: snippet.description,
         publishTime: snippet.publishedAt,
         channelTitle: snippet.channelTitle,
         statistics: item.statistics ? item.statistics : { viewCount: "0" },
-        imgUrl: item.snippet.thumbnails.high.url,
-        id: typeof item.id === "string" ? item.id : item.id.videoId,
+        imgUrl: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+        id,
       };
     });
   } catch (error) {
@@ -116,9 +108,18 @@ export const getVideoLikeDislike = async (videoId: string) => {
     },
   });
   const { foundVideo } = await response.json();
-  if (foundVideo.length > 0) {
-    console.log(foundVideo);
-
+  if (foundVideo?.length > 0) {
     return foundVideo[0].favourited;
   }
+};
+export const getWatchItAgainVideos = async (userId: string, token: string) => {
+  const videos = await getWatchedVideos(userId, token);
+  return (
+    videos?.map((video: any) => {
+      return {
+        id: video.videoId,
+        imgUrl: `https://i.ytimg.com/vi/${video.videoId}/maxresdefault.jpg`,
+      };
+    }) || []
+  );
 };

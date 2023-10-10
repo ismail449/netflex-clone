@@ -3,15 +3,23 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Banner from "@/components/banner/banner";
 import Navbar from "@/components/navbar/navbar";
 import CardsSection from "@/components/cards-section/cards-section";
-import { getPopularVideos, getVideos, Video } from "@/lib/videos";
+import {
+  getPopularVideos,
+  getVideos,
+  Video,
+  getWatchItAgainVideos,
+} from "@/lib/videos";
 import styles from "@/styles/Home.module.css";
+import { redirectUser } from "@/utils";
 
 export default function Home({
   DCVideos,
   travelVideos,
   productivityVideos,
   popularVideos,
+  watchItAgainVideos,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  console.log({ watchItAgainVideos });
   return (
     <>
       <Head>
@@ -29,6 +37,11 @@ export default function Home({
           title="clifford the big red dog"
         />
         <div className={styles.sectionWrapper}>
+          <CardsSection
+            title="Watch it again"
+            videos={watchItAgainVideos}
+            size="small"
+          />
           <CardsSection title="DC" videos={DCVideos} size="large" />
           <CardsSection title="Travel" videos={travelVideos} size="small" />
           <CardsSection
@@ -52,7 +65,19 @@ export const getServerSideProps: GetServerSideProps<{
   travelVideos: Video[];
   productivityVideos: Video[];
   popularVideos: Video[];
-}> = async () => {
+  watchItAgainVideos: Video[];
+}> = async (context) => {
+  const { userId, token } = await redirectUser(context);
+  if (!userId) {
+    return {
+      props: {},
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+  const watchItAgainVideos = await getWatchItAgainVideos(userId, token ?? "");
   const DCVideos = await getVideos("DC trailers");
   const travelVideos = await getVideos("travel");
 
@@ -61,6 +86,12 @@ export const getServerSideProps: GetServerSideProps<{
   const popularVideos = await getPopularVideos();
 
   return {
-    props: { DCVideos, travelVideos, productivityVideos, popularVideos },
+    props: {
+      DCVideos,
+      travelVideos,
+      productivityVideos,
+      popularVideos,
+      watchItAgainVideos,
+    },
   };
 };
